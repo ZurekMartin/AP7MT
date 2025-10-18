@@ -3,10 +3,16 @@ package com.example.ap7mt.ui.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -16,8 +22,14 @@ import com.example.ap7mt.data.model.Game
 fun GameListItem(
     game: Game,
     onGameClick: (Game) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onFavoriteClick: ((Game) -> Unit)? = null
 ) {
+    val context = LocalContext.current
+    val favoritesRepository = com.example.ap7mt.data.repository.FavoritesRepository.getInstance(context)
+    val favorites by favoritesRepository.favorites.collectAsState()
+    val isFavorite = favorites.contains(game.id)
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -42,12 +54,36 @@ fun GameListItem(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(
-                    text = game.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Text(
+                        text = game.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    IconButton(
+                        onClick = {
+                            if (onFavoriteClick != null) {
+                                onFavoriteClick(game)
+                            } else {
+                                favoritesRepository.toggleFavorite(game.id)
+                            }
+                        },
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            contentDescription = if (isFavorite) "Odebrat z oblíbených" else "Přidat do oblíbených",
+                            tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(4.dp))
 

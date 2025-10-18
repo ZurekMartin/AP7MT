@@ -10,6 +10,7 @@
     <string name="error">Chyba</string>
     <string name="retry">Zkusit znovu</string>
     <string name="no_games_found">Žádné hry nenalezeny</string>
+    <string name="no_favorite_games">Žádné oblíbené hry</string>
     <string name="play_game">Hrát hru</string>
     <string name="developer">Vývojář</string>
     <string name="publisher">Vydavatel</string>

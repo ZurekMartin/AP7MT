@@ -13,12 +13,22 @@ import com.example.ap7mt.ui.viewmodel.ViewMode
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Toolbar(
-    showFilters: Boolean,
-    onToggleFilters: () -> Unit,
+    showClearAllFavorites: Boolean = false,
+    onClearAllFavorites: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
         title = { Text("GameDatabase") },
+        actions = {
+            if (showClearAllFavorites && onClearAllFavorites != null) {
+                IconButton(onClick = onClearAllFavorites) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Smazat všechny oblíbené"
+                    )
+                }
+            }
+        },
         modifier = modifier
     )
 }

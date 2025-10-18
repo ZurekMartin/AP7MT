@@ -18,7 +18,8 @@ fun GameList(
     games: List<Game>,
     viewMode: ViewMode,
     onGameClick: (Game) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onFavoriteClick: ((Game) -> Unit)? = null
 ) {
     when (viewMode) {
         ViewMode.LIST -> {
@@ -30,7 +31,8 @@ fun GameList(
                 items(games) { game ->
                     GameListItem(
                         game = game,
-                        onGameClick = onGameClick
+                        onGameClick = onGameClick,
+                        onFavoriteClick = onFavoriteClick
                     )
                 }
             }
@@ -46,7 +48,8 @@ fun GameList(
                 items(games) { game ->
                     GameCard(
                         game = game,
-                        onGameClick = onGameClick
+                        onGameClick = onGameClick,
+                        onFavoriteClick = onFavoriteClick
                     )
                 }
             }

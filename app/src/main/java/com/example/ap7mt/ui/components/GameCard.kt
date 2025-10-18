@@ -3,22 +3,35 @@ package com.example.ap7mt.ui.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.ap7mt.data.model.Game
+import com.example.ap7mt.data.repository.FavoritesRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameCard(
     game: Game,
     onGameClick: (Game) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onFavoriteClick: ((Game) -> Unit)? = null
 ) {
+    val context = LocalContext.current
+    val favoritesRepository = FavoritesRepository.getInstance(context)
+    val favorites by favoritesRepository.favorites.collectAsState()
+    val isFavorite = favorites.contains(game.id)
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -26,14 +39,35 @@ fun GameCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
-            AsyncImage(
-                model = game.thumbnail,
-                contentDescription = game.title,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp),
-                contentScale = ContentScale.Crop
-            )
+            Box {
+                AsyncImage(
+                    model = game.thumbnail,
+                    contentDescription = game.title,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp),
+                    contentScale = ContentScale.Crop
+                )
+
+                IconButton(
+                    onClick = {
+                        if (onFavoriteClick != null) {
+                            onFavoriteClick(game)
+                        } else {
+                            favoritesRepository.toggleFavorite(game.id)
+                        }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                        contentDescription = if (isFavorite) "Odebrat z oblíbených" else "Přidat do oblíbených",
+                        tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                }
+            }
 
             Column(
                 modifier = Modifier.padding(16.dp)

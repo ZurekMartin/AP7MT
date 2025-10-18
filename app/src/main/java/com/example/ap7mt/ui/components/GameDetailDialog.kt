@@ -17,12 +17,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import com.example.ap7mt.data.model.Game
+import com.example.ap7mt.data.repository.FavoritesRepository
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -116,7 +118,7 @@ fun GameDetailDialog(
                         }
 
                         if (game != null && game.screenshots.isNotEmpty()) {
-                            ScreenshotGallery(screenshots = game.screenshots)
+                            ScreenshotGallery(screenshots = game.screenshots, game = game)
                         }
 
                         Column(
@@ -241,8 +243,13 @@ fun GameDetailDialog(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ScreenshotGallery(screenshots: List<com.example.ap7mt.data.model.Screenshot>) {
+private fun ScreenshotGallery(screenshots: List<com.example.ap7mt.data.model.Screenshot>, game: Game) {
     if (screenshots.isEmpty()) return
+
+    val context = LocalContext.current
+    val favoritesRepository = FavoritesRepository.getInstance(context)
+    val favorites by favoritesRepository.favorites.collectAsState()
+    val isFavorite = favorites.contains(game.id)
 
     val pagerState = rememberPagerState(pageCount = { Int.MAX_VALUE })
     val coroutineScope = rememberCoroutineScope()
@@ -263,6 +270,19 @@ private fun ScreenshotGallery(screenshots: List<com.example.ap7mt.data.model.Scr
                 contentDescription = "Screenshot ${screenshotIndex + 1}",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
+            )
+        }
+
+        IconButton(
+            onClick = { favoritesRepository.toggleFavorite(game.id) },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                contentDescription = if (isFavorite) "Odebrat z oblíbených" else "Přidat do oblíbených",
+                tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
         }
 

@@ -1,8 +1,11 @@
 package com.example.ap7mt.ui.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.ap7mt.data.model.*
+import com.example.ap7mt.data.repository.FavoritesRepository
 import com.example.ap7mt.data.repository.GameRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,9 +38,12 @@ enum class ViewMode(val displayName: String) {
     LIST("Seznam"), GRID("Mřížka")
 }
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(
+    context: Context? = null
+) : ViewModel() {
 
     private val repository = GameRepository()
+    private val favoritesRepository = context?.let { FavoritesRepository.getInstance(it) }
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -239,5 +245,19 @@ class HomeViewModel : ViewModel() {
 
     fun closeFilterMenu() {
         _uiState.value = _uiState.value.copy(showFilterMenu = false)
+    }
+
+    fun toggleFavorite(game: Game) {
+        favoritesRepository?.toggleFavorite(game.id)
+    }
+}
+
+class HomeViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return HomeViewModel(context) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import com.example.ap7mt.ui.screens.FavoritesScreen
 import com.example.ap7mt.ui.screens.HomeScreen
 import com.example.ap7mt.ui.theme.GameDatabaseTheme
 
@@ -58,7 +59,7 @@ fun GameDatabaseApp() {
     ) {
         when (currentDestination) {
             AppDestinations.HOME -> HomeScreen()
-            AppDestinations.FAVORITES -> PlaceholderScreen("Oblíbené hry")
+            AppDestinations.FAVORITES -> FavoritesScreen()
             AppDestinations.PROFILE -> PlaceholderScreen("Uživatelský profil")
         }
     }

@@ -5,6 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -16,22 +17,22 @@ import com.example.ap7mt.ui.components.SearchBar
 import com.example.ap7mt.ui.components.Toolbar
 import com.example.ap7mt.ui.theme.GameDatabaseTheme
 import com.example.ap7mt.ui.viewmodel.HomeViewModel
+import com.example.ap7mt.ui.viewmodel.HomeViewModelFactory
 import com.example.ap7mt.ui.viewmodel.ViewMode
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = viewModel(
+        factory = HomeViewModelFactory(LocalContext.current)
+    )
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     GameDatabaseTheme() {
         Scaffold(
             topBar = {
-                Toolbar(
-                    showFilters = uiState.showFilters,
-                    onToggleFilters = viewModel::toggleFiltersVisibility
-                )
+                Toolbar()
             }
         ) { paddingValues ->
             Column(
@@ -86,7 +87,8 @@ fun HomeScreen(
                             GameList(
                                 games = uiState.games,
                                 viewMode = uiState.viewMode,
-                                onGameClick = viewModel::showGameDetail
+                                onGameClick = viewModel::showGameDetail,
+                                onFavoriteClick = viewModel::toggleFavorite
                             )
                         }
                     }
