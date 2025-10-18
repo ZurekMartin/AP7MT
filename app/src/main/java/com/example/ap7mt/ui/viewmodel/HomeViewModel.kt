@@ -24,14 +24,14 @@ data class HomeUiState(
     val platform: Platform = Platform.ALL,
     val category: Category = Category.ALL,
     val sortBy: SortBy = SortBy.RELEVANCE,
-    val viewMode: ViewMode = ViewMode.LIST,
+    val viewMode: ViewMode = ViewMode.GRID,
     val showFilters: Boolean = true,
     val showGameDetail: Boolean = false,
     val showFilterMenu: Boolean = false,
     val tempPlatform: Platform = Platform.ALL,
     val tempCategory: Category = Category.ALL,
     val tempSortBy: SortBy = SortBy.RELEVANCE,
-    val tempViewMode: ViewMode = ViewMode.LIST
+    val tempViewMode: ViewMode = ViewMode.GRID
 )
 
 enum class ViewMode(val displayName: String) {
@@ -239,7 +239,7 @@ class HomeViewModel(
             tempPlatform = Platform.ALL,
             tempCategory = Category.ALL,
             tempSortBy = SortBy.RELEVANCE,
-            tempViewMode = ViewMode.LIST
+            tempViewMode = ViewMode.GRID
         )
     }
 

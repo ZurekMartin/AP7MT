@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -16,6 +17,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -58,7 +61,8 @@ fun GameDetailDialog(
                 .fillMaxWidth(0.95f)
                 .fillMaxHeight(0.9f)
                 .padding(16.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+            shape = MaterialTheme.shapes.extraLarge
         ) {
             when {
                 isLoading -> {
@@ -259,6 +263,7 @@ private fun ScreenshotGallery(screenshots: List<com.example.ap7mt.data.model.Scr
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
+            .clip(MaterialTheme.shapes.large)
     ) {
         HorizontalPager(
             state = pagerState,
@@ -268,54 +273,82 @@ private fun ScreenshotGallery(screenshots: List<com.example.ap7mt.data.model.Scr
             AsyncImage(
                 model = screenshots[screenshotIndex].image,
                 contentDescription = "Screenshot ${screenshotIndex + 1}",
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(MaterialTheme.shapes.large),
                 contentScale = ContentScale.Crop
             )
         }
 
-        IconButton(
-            onClick = { favoritesRepository.toggleFavorite(game.id) },
+        Surface(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(8.dp)
+                .padding(12.dp)
+                .size(40.dp),
+            shape = CircleShape,
+            color = Color.White.copy(alpha = 0.9f),
+            shadowElevation = 4.dp
         ) {
-            Icon(
-                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                contentDescription = if (isFavorite) "Odebrat z oblíbených" else "Přidat do oblíbených",
-                tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
+            IconButton(
+                onClick = { favoritesRepository.toggleFavorite(game.id) },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Icon(
+                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    contentDescription = if (isFavorite) "Odebrat z oblíbených" else "Přidat do oblíbených",
+                    tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            }
         }
 
-        IconButton(
-            onClick = {
-                coroutineScope.launch {
-                    pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                }
-            },
+        Surface(
             modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding(8.dp)
+                .align(Alignment.BottomStart)
+                .padding(12.dp)
+                .size(44.dp),
+            shape = CircleShape,
+            color = Color.White.copy(alpha = 0.85f),
+            shadowElevation = 6.dp
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = "Předchozí"
-            )
+            IconButton(
+                onClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = "Předchozí",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
         }
 
-        IconButton(
-            onClick = {
-                coroutineScope.launch {
-                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                }
-            },
+        Surface(
             modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .padding(8.dp)
+                .align(Alignment.BottomEnd)
+                .padding(12.dp)
+                .size(44.dp),
+            shape = CircleShape,
+            color = Color.White.copy(alpha = 0.85f),
+            shadowElevation = 6.dp
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "Další"
-            )
+            IconButton(
+                onClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "Další",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
         }
 
         Row(

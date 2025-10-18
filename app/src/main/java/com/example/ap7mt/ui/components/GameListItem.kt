@@ -2,6 +2,7 @@ package com.example.ap7mt.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -11,6 +12,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
@@ -34,7 +37,8 @@ fun GameListItem(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onGameClick(game) },
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        shape = MaterialTheme.shapes.medium
     ) {
         Row(
             modifier = Modifier
@@ -46,7 +50,8 @@ fun GameListItem(
                 model = game.thumbnail,
                 contentDescription = game.title,
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(90.dp)
+                    .clip(MaterialTheme.shapes.small)
                     .padding(end = 16.dp),
                 contentScale = ContentScale.Crop
             )
@@ -67,21 +72,28 @@ fun GameListItem(
                         modifier = Modifier.weight(1f)
                     )
 
-                    IconButton(
-                        onClick = {
-                            if (onFavoriteClick != null) {
-                                onFavoriteClick(game)
-                            } else {
-                                favoritesRepository.toggleFavorite(game.id)
-                            }
-                        },
-                        modifier = Modifier.size(24.dp)
+                    Surface(
+                        modifier = Modifier.size(32.dp),
+                        shape = CircleShape,
+                        color = Color.White.copy(alpha = 0.9f),
+                        shadowElevation = 2.dp
                     ) {
-                        Icon(
-                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                            contentDescription = if (isFavorite) "Odebrat z oblíbených" else "Přidat do oblíbených",
-                            tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
+                        IconButton(
+                            onClick = {
+                                if (onFavoriteClick != null) {
+                                    onFavoriteClick(game)
+                                } else {
+                                    favoritesRepository.toggleFavorite(game.id)
+                                }
+                            },
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                contentDescription = if (isFavorite) "Odebrat z oblíbených" else "Přidat do oblíbených",
+                                tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            )
+                        }
                     }
                 }
 

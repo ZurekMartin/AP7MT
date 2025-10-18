@@ -26,7 +26,7 @@ fun GameList(
             LazyColumn(
                 modifier = modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(games) { game ->
                     GameListItem(
@@ -39,7 +39,7 @@ fun GameList(
         }
         ViewMode.GRID -> {
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 300.dp),
+                columns = GridCells.Adaptive(minSize = 320.dp),
                 modifier = modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),

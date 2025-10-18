@@ -18,17 +18,30 @@ fun Toolbar(
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
-        title = { Text("GameDatabase") },
+        title = {
+            Text(
+                "GameDatabase",
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                )
+            )
+        },
         actions = {
             if (showClearAllFavorites && onClearAllFavorites != null) {
                 IconButton(onClick = onClearAllFavorites) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Smazat všechny oblíbené"
+                        contentDescription = "Smazat všechny oblíbené",
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
         },
-        modifier = modifier
+        modifier = modifier,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            actionIconContentColor = MaterialTheme.colorScheme.onSurface
+        )
     )
 }

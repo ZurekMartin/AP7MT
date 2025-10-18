@@ -33,7 +33,8 @@ fun HomeScreen(
         Scaffold(
             topBar = {
                 Toolbar()
-            }
+            },
+            containerColor = MaterialTheme.colorScheme.background
         ) { paddingValues ->
             Column(
                 modifier = modifier

@@ -23,11 +23,12 @@ fun SearchBar(
     OutlinedTextField(
         value = query,
         onValueChange = onQueryChange,
-        placeholder = { Text("Hledat hry...") },
+        placeholder = { Text("Hledat hry...", style = MaterialTheme.typography.bodyLarge) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = "Hledat"
+                contentDescription = "Hledat",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         },
         trailingIcon = {
@@ -39,21 +40,30 @@ fun SearchBar(
                     IconButton(onClick = onClearSearch) {
                         Icon(
                             imageVector = Icons.Default.Clear,
-                            contentDescription = "Vymazat hledání"
+                            contentDescription = "Vymazat hledání",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
                 IconButton(onClick = onToggleFilterMenu) {
                     Icon(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = "Filtry"
+                        contentDescription = "Filtry",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
         },
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        singleLine = true
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        singleLine = true,
+        shape = MaterialTheme.shapes.large,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        )
     )
 }
