@@ -1,3 +1,19 @@
 <resources>
-    <string name="app_name">AP7MT</string>
+    <string name="app_name">GameDatabase</string>
+    <string name="filters">Filtry</string>
+    <string name="platform">Platforma</string>
+    <string name="category">Kategorie</string>
+    <string name="sort_by">Řadit podle</string>
+    <string name="all_platforms">Všechny platformy</string>
+    <string name="all_categories">Všechny kategorie</string>
+    <string name="loading">Načítání...</string>
+    <string name="error">Chyba</string>
+    <string name="retry">Zkusit znovu</string>
+    <string name="no_games_found">Žádné hry nenalezeny</string>
+    <string name="play_game">Hrát hru</string>
+    <string name="developer">Vývojář</string>
+    <string name="publisher">Vydavatel</string>
+    <string name="release_date">Datum vydání</string>
+    <string name="description">Popis</string>
+    <string name="close">Zavřít</string>
 </resources>
