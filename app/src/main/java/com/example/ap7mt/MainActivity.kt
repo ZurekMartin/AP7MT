@@ -17,8 +17,10 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import com.example.ap7mt.R
 import com.example.ap7mt.ui.screens.FavoritesScreen
 import com.example.ap7mt.ui.screens.HomeScreen
 import com.example.ap7mt.ui.screens.MapScreen
@@ -48,10 +50,10 @@ fun GameDatabaseApp() {
                     icon = {
                         Icon(
                             it.icon,
-                            contentDescription = it.label
+                            contentDescription = stringResource(it.labelResId)
                         )
                     },
-                    label = { Text(it.label) },
+                    label = { Text(stringResource(it.labelResId)) },
                     selected = it == currentDestination,
                     onClick = { currentDestination = it }
                 )
@@ -86,12 +88,12 @@ fun PlaceholderScreen(title: String) {
 }
 
 enum class AppDestinations(
-    val label: String,
+    val labelResId: Int,
     val icon: ImageVector,
 ) {
-    HOME("Domů", Icons.Default.Home),
-    FAVORITES("Oblíbené", Icons.Default.Favorite),
-    PROFILE("Obchody", Icons.Default.ShoppingCart),
+    HOME(R.string.home, Icons.Default.Home),
+    FAVORITES(R.string.favorites, Icons.Default.Favorite),
+    PROFILE(R.string.stores, Icons.Default.ShoppingCart),
 }
 
 @Composable

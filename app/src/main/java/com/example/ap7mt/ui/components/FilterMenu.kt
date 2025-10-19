@@ -9,9 +9,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.ap7mt.R
 import com.example.ap7mt.data.model.Platform
 import com.example.ap7mt.data.model.Category
 import com.example.ap7mt.data.model.SortBy
@@ -55,13 +57,13 @@ fun FilterMenu(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Box(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = "Filtry",
+                            text = stringResource(R.string.filters),
                             style = MaterialTheme.typography.headlineSmall,
                             modifier = Modifier.align(Alignment.CenterStart)
                         )
@@ -72,36 +74,34 @@ fun FilterMenu(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Zavřít"
+                                contentDescription = stringResource(R.string.close)
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
                     FilterDropdown(
-                        label = "Platforma",
+                        label = stringResource(R.string.platform),
                         selectedValue = selectedPlatform,
                         options = Platform.entries,
                         onValueChange = onPlatformChange
                     )
 
                     FilterDropdown(
-                        label = "Kategorie",
+                        label = stringResource(R.string.category),
                         selectedValue = selectedCategory,
                         options = Category.entries,
                         onValueChange = onCategoryChange
                     )
 
                     FilterDropdown(
-                        label = "Řadit podle",
+                        label = stringResource(R.string.sort_by),
                         selectedValue = selectedSortBy,
                         options = SortBy.entries,
                         onValueChange = onSortByChange
                     )
 
                     FilterDropdown(
-                        label = "Zobrazení",
+                        label = stringResource(R.string.view_mode),
                         selectedValue = selectedViewMode,
                         options = ViewMode.entries,
                         onValueChange = onViewModeChange
@@ -117,7 +117,7 @@ fun FilterMenu(
                             onClick = onResetFilters,
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Resetovat")
+                            Text(stringResource(R.string.reset))
                         }
 
                         Button(
@@ -127,7 +127,7 @@ fun FilterMenu(
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Použít")
+                            Text(stringResource(R.string.apply))
                         }
                     }
                 }

@@ -7,6 +7,8 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -37,10 +39,12 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ap7mt.R
 import com.example.ap7mt.ui.theme.GameDatabaseTheme
 import com.example.ap7mt.ui.viewmodel.MapViewModel
 import kotlinx.coroutines.launch
@@ -72,9 +76,24 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) {
+            viewModel.fetchUserLocation(context)
+        } else {
+            viewModel.loadStores()
+        }
+    }
+
     LaunchedEffect(Unit) {
-        viewModel.loadStores()
-        viewModel.requestLocationPermission(context)
+        permissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+    }
+
+    LaunchedEffect(userLocation) {
+        scope.launch { viewModel.centerOnUserLocation(mapView) }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -104,6 +123,10 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
                 locationOverlay.enableMyLocation()
                 map.overlays.add(locationOverlay)
 
+                val center = userLocation?.let { GeoPoint(it.latitude, it.longitude) }
+                    ?: GeoPoint(49.2308443, 17.657083)
+                map.controller.setCenter(center)
+
                 stores.forEach { store: ElectronicStore ->
                     val marker = Marker(map).apply {
                         position = GeoPoint(store.latitude, store.longitude)
@@ -127,38 +150,11 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
             }
         )
 
-        TopAppBar(
-            title = {
-                Text(
-                    "GameDatabase",
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-                    )
-                )
-            },
-            actions = {
-                IconButton(
-                    onClick = {
-                        scope.launch {
-                            viewModel.centerOnUserLocation(mapView)
-                        }
-                    }
-                ) {
-                    Icon(Icons.Default.LocationOn, contentDescription = "Moje poloha")
-                }
-            },
-            modifier = Modifier
-                .align(Alignment.TopCenter),
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                titleContentColor = MaterialTheme.colorScheme.onSurface,
-                actionIconContentColor = MaterialTheme.colorScheme.onSurface
-            )
-        )
-
         if (isLoading) {
             androidx.compose.material3.Surface(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
             ) {
                 Box(
@@ -171,7 +167,7 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
                 ) {
                     CircularProgressIndicator()
                     Text(
-                        text = "Načítání obchodů...",
+                        text = stringResource(R.string.loading_stores),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -182,7 +178,9 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
 
         if (error != null) {
             androidx.compose.material3.Surface(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
             ) {
                 Box(
@@ -195,7 +193,7 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "Chyba",
+                        text = stringResource(R.string.error),
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -206,12 +204,45 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                     OutlinedButton(onClick = { viewModel.loadStores() }) {
-                        Text("Zkusit znovu")
+                        Text(stringResource(R.string.retry))
                     }
                 }
                 }
             }
         }
+
+        TopAppBar(
+            title = {
+            Text(
+                stringResource(R.string.app_name),
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                )
+            )
+            },
+            actions = {
+                IconButton(
+                    onClick = {
+                        val fineGranted = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                        val coarseGranted = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                        if (fineGranted || coarseGranted) {
+                            viewModel.fetchUserLocation(context)
+                        } else {
+                            permissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+                        }
+                    }
+                ) {
+                    Icon(Icons.Default.LocationOn, contentDescription = stringResource(R.string.my_location))
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.TopCenter),
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
+                actionIconContentColor = MaterialTheme.colorScheme.onSurface
+            )
+        )
 
         if (selectedStore != null) {
             StoreDetailCard(
@@ -373,7 +404,7 @@ fun StoreDetailCard(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Navigovat")
+                Text(stringResource(R.string.navigate))
             }
         }
     }
@@ -397,7 +428,7 @@ private fun ErrorContent(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Chyba",
+                text = stringResource(R.string.error),
                 style = MaterialTheme.typography.headlineSmall
             )
             Text(
@@ -406,7 +437,7 @@ private fun ErrorContent(
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
             OutlinedButton(onClick = onRetry) {
-                Text("Zkusit znovu")
+                Text(stringResource(R.string.retry))
             }
         }
     }

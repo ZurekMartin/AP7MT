@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import com.example.ap7mt.R
 import com.example.ap7mt.data.model.Platform
 import com.example.ap7mt.data.model.Category
 import com.example.ap7mt.data.model.SortBy
@@ -28,26 +30,26 @@ fun Filters(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "Filtry",
+            text = stringResource(R.string.filters),
             style = MaterialTheme.typography.titleMedium
         )
 
         FilterDropdown(
-            label = "Platforma",
+            label = stringResource(R.string.platform),
             selectedValue = selectedPlatform,
             options = Platform.entries,
             onValueChange = onPlatformChange
         )
 
         FilterDropdown(
-            label = "Kategorie",
+            label = stringResource(R.string.category),
             selectedValue = selectedCategory,
             options = Category.entries,
             onValueChange = onCategoryChange
         )
 
         FilterDropdown(
-            label = "Řadit podle",
+            label = stringResource(R.string.sort_by),
             selectedValue = selectedSortBy,
             options = SortBy.entries,
             onValueChange = onSortByChange
