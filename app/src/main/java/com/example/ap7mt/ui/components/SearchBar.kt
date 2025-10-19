@@ -9,7 +9,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.ap7mt.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,11 +25,11 @@ fun SearchBar(
     OutlinedTextField(
         value = query,
         onValueChange = onQueryChange,
-        placeholder = { Text("Hledat hry...", style = MaterialTheme.typography.bodyLarge) },
+        placeholder = { Text(stringResource(R.string.search_games), style = MaterialTheme.typography.bodyLarge) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = "Hledat",
+                contentDescription = stringResource(R.string.search),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         },
@@ -40,7 +42,7 @@ fun SearchBar(
                     IconButton(onClick = onClearSearch) {
                         Icon(
                             imageVector = Icons.Default.Clear,
-                            contentDescription = "Vymazat hledání",
+                            contentDescription = stringResource(R.string.clear_search),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -48,7 +50,7 @@ fun SearchBar(
                 IconButton(onClick = onToggleFilterMenu) {
                     Icon(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = "Filtry",
+                        contentDescription = stringResource(R.string.filters),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

@@ -7,7 +7,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.ap7mt.R
 import com.example.ap7mt.ui.viewmodel.ViewMode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -20,7 +22,7 @@ fun Toolbar(
     TopAppBar(
         title = {
             Text(
-                "GameDatabase",
+                stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
                 )
@@ -31,7 +33,7 @@ fun Toolbar(
                 IconButton(onClick = onClearAllFavorites) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Smazat všechny oblíbené",
+                        contentDescription = stringResource(R.string.delete_all_favorites),
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }

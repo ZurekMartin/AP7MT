@@ -22,10 +22,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
+import com.example.ap7mt.R
 import com.example.ap7mt.data.model.Game
 import com.example.ap7mt.data.repository.FavoritesRepository
 import kotlinx.coroutines.launch
@@ -83,7 +85,7 @@ fun GameDetailDialog(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Chyba při načítání detailu",
+                            text = stringResource(R.string.error_loading_details),
                             style = MaterialTheme.typography.headlineSmall
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -93,7 +95,7 @@ fun GameDetailDialog(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(onClick = onDismiss) {
-                            Text("Zavřít")
+                            Text(stringResource(R.string.close))
                         }
                     }
                 }
@@ -117,7 +119,7 @@ fun GameDetailDialog(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
-                                    contentDescription = "Zavřít"
+                                    contentDescription = stringResource(R.string.close)
                                 )
                             }
                         }
@@ -145,7 +147,7 @@ fun GameDetailDialog(
 
                             if (displayGame.shortDescription.isNotBlank()) {
                                 Text(
-                                    text = "Krátký popis",
+                                    text = stringResource(R.string.short_description),
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 Text(
@@ -156,7 +158,7 @@ fun GameDetailDialog(
 
                             if (displayGame.developer.isNotBlank()) {
                                 Text(
-                                    text = "Vývojář",
+                                    text = stringResource(R.string.developer),
                                     style = MaterialTheme.typography.titleSmall
                                 )
                                 Text(
@@ -167,7 +169,7 @@ fun GameDetailDialog(
 
                             if (displayGame.publisher.isNotBlank()) {
                                 Text(
-                                    text = "Vydavatel",
+                                    text = stringResource(R.string.publisher),
                                     style = MaterialTheme.typography.titleSmall
                                 )
                                 Text(
@@ -178,7 +180,7 @@ fun GameDetailDialog(
 
                             if (displayGame.releaseDate.isNotBlank()) {
                                 Text(
-                                    text = "Datum vydání",
+                                    text = stringResource(R.string.release_date),
                                     style = MaterialTheme.typography.titleSmall
                                 )
                                 Text(
@@ -189,7 +191,7 @@ fun GameDetailDialog(
 
                             if (game != null && game.description.isNotBlank()) {
                                 Text(
-                                    text = "Detailní popis",
+                                    text = stringResource(R.string.detailed_description),
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 Text(
@@ -200,24 +202,24 @@ fun GameDetailDialog(
 
                             game?.minimumSystemRequirements?.let { requirements ->
                                 Text(
-                                    text = "Minimální požadavky na systém",
+                                    text = stringResource(R.string.system_requirements),
                                     style = MaterialTheme.typography.titleMedium
                                 )
 
                                 requirements.os?.let {
-                                    Text("OS: $it", style = MaterialTheme.typography.bodyMedium)
+                                    Text("${stringResource(R.string.os)}: $it", style = MaterialTheme.typography.bodyMedium)
                                 }
                                 requirements.processor?.let {
-                                    Text("Procesor: $it", style = MaterialTheme.typography.bodyMedium)
+                                    Text("${stringResource(R.string.processor)}: $it", style = MaterialTheme.typography.bodyMedium)
                                 }
                                 requirements.memory?.let {
-                                    Text("Paměť: $it", style = MaterialTheme.typography.bodyMedium)
+                                    Text("${stringResource(R.string.memory)}: $it", style = MaterialTheme.typography.bodyMedium)
                                 }
                                 requirements.graphics?.let {
-                                    Text("Grafika: $it", style = MaterialTheme.typography.bodyMedium)
+                                    Text("${stringResource(R.string.graphics)}: $it", style = MaterialTheme.typography.bodyMedium)
                                 }
                                 requirements.storage?.let {
-                                    Text("Úložiště: $it", style = MaterialTheme.typography.bodyMedium)
+                                    Text("${stringResource(R.string.storage)}: $it", style = MaterialTheme.typography.bodyMedium)
                                 }
                             }
                         }
@@ -244,7 +246,7 @@ fun GameDetailDialog(
                                     contentDescription = null,
                                     modifier = Modifier.padding(end = 8.dp)
                                 )
-                                Text("Sdílet")
+                                Text(stringResource(R.string.share))
                             }
 
                             OutlinedButton(
@@ -256,7 +258,7 @@ fun GameDetailDialog(
                                     contentDescription = null,
                                     modifier = Modifier.padding(end = 8.dp)
                                 )
-                                Text("Hrát hru")
+                                Text(stringResource(R.string.play_game))
                             }
                         }
                     }
@@ -276,9 +278,11 @@ private fun ScreenshotGallery(screenshots: List<com.example.ap7mt.data.model.Scr
     val favorites by favoritesRepository.favorites.collectAsState()
     val isFavorite = favorites.contains(game.id)
 
-    val pagerState = rememberPagerState(pageCount = { Int.MAX_VALUE })
+    val pagerState = rememberPagerState(pageCount = { screenshots.size })
     val coroutineScope = rememberCoroutineScope()
-    val actualPage = remember { derivedStateOf { pagerState.currentPage % screenshots.size } }
+    val actualPage = remember { derivedStateOf { pagerState.currentPage } }
+    val canScrollToPrevious = remember { derivedStateOf { actualPage.value > 0 } }
+    val canScrollToNext = remember { derivedStateOf { actualPage.value < screenshots.size - 1 } }
 
     Box(
         modifier = Modifier
@@ -290,10 +294,9 @@ private fun ScreenshotGallery(screenshots: List<com.example.ap7mt.data.model.Scr
             state = pagerState,
             modifier = Modifier.fillMaxSize()
         ) { page ->
-            val screenshotIndex = page % screenshots.size
             AsyncImage(
-                model = screenshots[screenshotIndex].image,
-                contentDescription = "Screenshot ${screenshotIndex + 1}",
+                model = screenshots[page].image,
+                contentDescription = "Screenshot ${page + 1}",
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(MaterialTheme.shapes.large),
@@ -316,7 +319,7 @@ private fun ScreenshotGallery(screenshots: List<com.example.ap7mt.data.model.Scr
             ) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                    contentDescription = if (isFavorite) "Odebrat z oblíbených" else "Přidat do oblíbených",
+                    contentDescription = if (isFavorite) stringResource(R.string.remove_from_favorites) else stringResource(R.string.add_to_favorites),
                     tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
             }
@@ -337,11 +340,12 @@ private fun ScreenshotGallery(screenshots: List<com.example.ap7mt.data.model.Scr
                         pagerState.animateScrollToPage(pagerState.currentPage - 1)
                     }
                 },
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                enabled = canScrollToPrevious.value
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                    contentDescription = "Předchozí",
+                    contentDescription = stringResource(R.string.previous),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -362,11 +366,12 @@ private fun ScreenshotGallery(screenshots: List<com.example.ap7mt.data.model.Scr
                         pagerState.animateScrollToPage(pagerState.currentPage + 1)
                     }
                 },
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                enabled = canScrollToNext.value
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = "Další",
+                    contentDescription = stringResource(R.string.next),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }

@@ -39,10 +39,12 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ap7mt.R
 import com.example.ap7mt.ui.theme.GameDatabaseTheme
 import com.example.ap7mt.ui.viewmodel.MapViewModel
 import kotlinx.coroutines.launch
@@ -165,7 +167,7 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
                 ) {
                     CircularProgressIndicator()
                     Text(
-                        text = "Načítání obchodů...",
+                        text = stringResource(R.string.loading_stores),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -191,7 +193,7 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "Chyba",
+                        text = stringResource(R.string.error),
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -202,7 +204,7 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                     OutlinedButton(onClick = { viewModel.loadStores() }) {
-                        Text("Zkusit znovu")
+                        Text(stringResource(R.string.retry))
                     }
                 }
                 }
@@ -211,12 +213,12 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
 
         TopAppBar(
             title = {
-                Text(
-                    "GameDatabase",
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-                    )
+            Text(
+                stringResource(R.string.app_name),
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
                 )
+            )
             },
             actions = {
                 IconButton(
@@ -230,7 +232,7 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
                         }
                     }
                 ) {
-                    Icon(Icons.Default.LocationOn, contentDescription = "Moje poloha")
+                    Icon(Icons.Default.LocationOn, contentDescription = stringResource(R.string.my_location))
                 }
             },
             modifier = Modifier
@@ -402,7 +404,7 @@ fun StoreDetailCard(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Navigovat")
+                Text(stringResource(R.string.navigate))
             }
         }
     }
@@ -426,7 +428,7 @@ private fun ErrorContent(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Chyba",
+                text = stringResource(R.string.error),
                 style = MaterialTheme.typography.headlineSmall
             )
             Text(
@@ -435,7 +437,7 @@ private fun ErrorContent(
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
             OutlinedButton(onClick = onRetry) {
-                Text("Zkusit znovu")
+                Text(stringResource(R.string.retry))
             }
         }
     }
