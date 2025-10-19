@@ -7,6 +7,8 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -72,9 +74,24 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) {
+            viewModel.fetchUserLocation(context)
+        } else {
+            viewModel.loadStores()
+        }
+    }
+
     LaunchedEffect(Unit) {
-        viewModel.loadStores()
-        viewModel.requestLocationPermission(context)
+        permissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+    }
+
+    LaunchedEffect(userLocation) {
+        scope.launch { viewModel.centerOnUserLocation(mapView) }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -104,6 +121,10 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
                 locationOverlay.enableMyLocation()
                 map.overlays.add(locationOverlay)
 
+                val center = userLocation?.let { GeoPoint(it.latitude, it.longitude) }
+                    ?: GeoPoint(49.2308443, 17.657083)
+                map.controller.setCenter(center)
+
                 stores.forEach { store: ElectronicStore ->
                     val marker = Marker(map).apply {
                         position = GeoPoint(store.latitude, store.longitude)
@@ -127,38 +148,11 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
             }
         )
 
-        TopAppBar(
-            title = {
-                Text(
-                    "GameDatabase",
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-                    )
-                )
-            },
-            actions = {
-                IconButton(
-                    onClick = {
-                        scope.launch {
-                            viewModel.centerOnUserLocation(mapView)
-                        }
-                    }
-                ) {
-                    Icon(Icons.Default.LocationOn, contentDescription = "Moje poloha")
-                }
-            },
-            modifier = Modifier
-                .align(Alignment.TopCenter),
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                titleContentColor = MaterialTheme.colorScheme.onSurface,
-                actionIconContentColor = MaterialTheme.colorScheme.onSurface
-            )
-        )
-
         if (isLoading) {
             androidx.compose.material3.Surface(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
             ) {
                 Box(
@@ -182,7 +176,9 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
 
         if (error != null) {
             androidx.compose.material3.Surface(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
             ) {
                 Box(
@@ -212,6 +208,39 @@ fun MapScreen(viewModel: MapViewModel = viewModel()) {
                 }
             }
         }
+
+        TopAppBar(
+            title = {
+                Text(
+                    "GameDatabase",
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                    )
+                )
+            },
+            actions = {
+                IconButton(
+                    onClick = {
+                        val fineGranted = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                        val coarseGranted = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                        if (fineGranted || coarseGranted) {
+                            viewModel.fetchUserLocation(context)
+                        } else {
+                            permissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+                        }
+                    }
+                ) {
+                    Icon(Icons.Default.LocationOn, contentDescription = "Moje poloha")
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.TopCenter),
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
+                actionIconContentColor = MaterialTheme.colorScheme.onSurface
+            )
+        )
 
         if (selectedStore != null) {
             StoreDetailCard(

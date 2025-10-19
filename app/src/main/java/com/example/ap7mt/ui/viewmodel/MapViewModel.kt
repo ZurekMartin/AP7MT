@@ -4,16 +4,22 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.annotation.SuppressLint
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ap7mt.data.api.ApiClient
 import com.example.ap7mt.data.repository.MapRepository
 import com.example.ap7mt.ui.screens.ElectronicStore
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 
@@ -37,11 +43,7 @@ class MapViewModel : ViewModel() {
     val error: StateFlow<String?> = _error.asStateFlow()
 
     init {
-        val defaultLocation = Location("").apply {
-            latitude = 49.2308443
-            longitude = 17.657083
-        }
-        _userLocation.value = defaultLocation
+        setDefaultZlinLocation()
         loadStores()
     }
 
@@ -76,9 +78,7 @@ class MapViewModel : ViewModel() {
     }
 
     fun requestLocationPermission(context: Context) {
-        userLocation.value?.let {
-            loadStores()
-        }
+        userLocation.value?.let { loadStores() }
     }
 
     suspend fun centerOnUserLocation(mapView: MapView) {
@@ -91,5 +91,53 @@ class MapViewModel : ViewModel() {
 
     fun updateUserLocation(location: Location) {
         _userLocation.value = location
+    }
+
+    private fun setDefaultZlinLocation() {
+        val defaultLocation = Location("").apply {
+            latitude = 49.2308443
+            longitude = 17.657083
+        }
+        _userLocation.value = defaultLocation
+    }
+
+    private fun hasLocationPermission(context: Context): Boolean {
+        val fine = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val coarse = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        return fine || coarse
+    }
+
+    fun fetchUserLocation(context: Context) {
+        viewModelScope.launch {
+            val location = obtainBestLocation(context)
+            if (location != null) {
+                _userLocation.value = location
+            } else {
+                setDefaultZlinLocation()
+            }
+            loadStores()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private suspend fun obtainBestLocation(context: Context): Location? {
+        if (!hasLocationPermission(context)) return null
+
+        val fused = LocationServices.getFusedLocationProviderClient(context)
+
+        val cancellationTokenSource = CancellationTokenSource()
+        val currentLocation = suspendCancellableCoroutine<Location?> { cont ->
+            val task = fused.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.token)
+            task.addOnSuccessListener { loc -> if (!cont.isCompleted) cont.resume(loc) }
+            task.addOnFailureListener { _ -> if (!cont.isCompleted) cont.resume(null) }
+            cont.invokeOnCancellation { cancellationTokenSource.cancel() }
+        }
+        if (currentLocation != null) return currentLocation
+
+        return suspendCancellableCoroutine { cont ->
+            val task = fused.lastLocation
+            task.addOnSuccessListener { loc -> if (!cont.isCompleted) cont.resume(loc) }
+            task.addOnFailureListener { _ -> if (!cont.isCompleted) cont.resume(null) }
+        }
     }
 }
