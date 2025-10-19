@@ -4,34 +4,33 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
-import com.example.ap7mt.ui.theme.AP7MTTheme
+import com.example.ap7mt.ui.screens.FavoritesScreen
+import com.example.ap7mt.ui.screens.HomeScreen
+import com.example.ap7mt.ui.screens.MapScreen
+import com.example.ap7mt.ui.theme.GameDatabaseTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AP7MTTheme {
-                AP7MTApp()
+            GameDatabaseTheme {
+                GameDatabaseApp()
             }
         }
     }
@@ -39,7 +38,7 @@ class MainActivity : ComponentActivity() {
 
 @PreviewScreenSizes
 @Composable
-fun AP7MTApp() {
+fun GameDatabaseApp() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
 
     NavigationSuiteScaffold(
@@ -59,11 +58,29 @@ fun AP7MTApp() {
             }
         }
     ) {
+        when (currentDestination) {
+            AppDestinations.HOME -> HomeScreen()
+            AppDestinations.FAVORITES -> FavoritesScreen()
+            AppDestinations.PROFILE -> MapScreen()
+        }
+    }
+}
+
+@Composable
+fun PlaceholderScreen(title: String) {
+    GameDatabaseTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentAlignment = androidx.compose.ui.Alignment.Center
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }
         }
     }
 }
@@ -72,9 +89,9 @@ enum class AppDestinations(
     val label: String,
     val icon: ImageVector,
 ) {
-    HOME("Home", Icons.Default.Home),
-    FAVORITES("Favorites", Icons.Default.Favorite),
-    PROFILE("Profile", Icons.Default.AccountBox),
+    HOME("Domů", Icons.Default.Home),
+    FAVORITES("Oblíbené", Icons.Default.Favorite),
+    PROFILE("Obchody", Icons.Default.ShoppingCart),
 }
 
 @Composable
@@ -88,7 +105,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    AP7MTTheme {
+    GameDatabaseTheme {
         Greeting("Android")
     }
 }
