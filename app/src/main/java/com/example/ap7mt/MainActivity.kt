@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import com.example.ap7mt.ui.screens.FavoritesScreen
 import com.example.ap7mt.ui.screens.HomeScreen
+import com.example.ap7mt.ui.screens.MapScreen
 import com.example.ap7mt.ui.theme.GameDatabaseTheme
 
 class MainActivity : ComponentActivity() {
@@ -60,7 +61,7 @@ fun GameDatabaseApp() {
         when (currentDestination) {
             AppDestinations.HOME -> HomeScreen()
             AppDestinations.FAVORITES -> FavoritesScreen()
-            AppDestinations.PROFILE -> PlaceholderScreen("Uživatelský profil")
+            AppDestinations.PROFILE -> MapScreen()
         }
     }
 }
@@ -90,7 +91,7 @@ enum class AppDestinations(
 ) {
     HOME("Domů", Icons.Default.Home),
     FAVORITES("Oblíbené", Icons.Default.Favorite),
-    PROFILE("Profil", Icons.Default.AccountBox),
+    PROFILE("Obchody", Icons.Default.ShoppingCart),
 }
 
 @Composable

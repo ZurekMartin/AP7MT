@@ -30,4 +30,11 @@ object ApiClient {
         .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
         .create(FreeToGameApi::class.java)
+
+    val overpassApi: OverpassApi = Retrofit.Builder()
+        .baseUrl("https://overpass-api.de/")
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create(gson))
+        .build()
+        .create(OverpassApi::class.java)
 }

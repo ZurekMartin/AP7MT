@@ -58,10 +58,10 @@ fun GameCard(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(12.dp)
-                        .size(40.dp),
+                        .size(44.dp),
                     shape = CircleShape,
-                    color = Color.White.copy(alpha = 0.9f),
-                    shadowElevation = 4.dp
+                    color = Color.White.copy(alpha = 0.85f),
+                    shadowElevation = 6.dp
                 ) {
                     IconButton(
                         onClick = {

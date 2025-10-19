@@ -73,10 +73,10 @@ fun GameListItem(
                     )
 
                     Surface(
-                        modifier = Modifier.size(32.dp),
+                        modifier = Modifier.size(44.dp),
                         shape = CircleShape,
-                        color = Color.White.copy(alpha = 0.9f),
-                        shadowElevation = 2.dp
+                        color = Color.White.copy(alpha = 0.85f),
+                        shadowElevation = 6.dp
                     ) {
                         IconButton(
                             onClick = {

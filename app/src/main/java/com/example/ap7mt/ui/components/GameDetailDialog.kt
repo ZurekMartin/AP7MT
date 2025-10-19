@@ -40,6 +40,7 @@ fun GameDetailDialog(
     onDismiss: () -> Unit
 ) {
     val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
 
     val displayGame = game ?: selectedGame
 
@@ -140,12 +141,6 @@ fun GameDetailDialog(
                                     onClick = {},
                                     label = { Text(displayGame.platform) }
                                 )
-                                if (game != null && game.status.isNotBlank()) {
-                                    AssistChip(
-                                        onClick = {},
-                                        label = { Text("Status: ${game.status}") }
-                                    )
-                                }
                             }
 
                             if (displayGame.shortDescription.isNotBlank()) {
@@ -227,16 +222,42 @@ fun GameDetailDialog(
                             }
                         }
 
-                        OutlinedButton(
-                            onClick = { uriHandler.openUri(displayGame.gameUrl) },
-                            modifier = Modifier.fillMaxWidth()
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                contentDescription = null,
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                            Text("Hrát hru")
+                            OutlinedButton(
+                                onClick = {
+                                    // Implementovat sdílení
+                                    val shareText = "Podívej se na tuto hru: ${displayGame.title}\n\n${displayGame.shortDescription}\n\nHraj zde: ${displayGame.gameUrl}"
+                                    val shareIntent = android.content.Intent().apply {
+                                        action = android.content.Intent.ACTION_SEND
+                                        type = "text/plain"
+                                        putExtra(android.content.Intent.EXTRA_TEXT, shareText)
+                                    }
+                                    context.startActivity(android.content.Intent.createChooser(shareIntent, "Sdílet hru"))
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Share,
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(end = 8.dp)
+                                )
+                                Text("Sdílet")
+                            }
+
+                            OutlinedButton(
+                                onClick = { uriHandler.openUri(displayGame.gameUrl) },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(end = 8.dp)
+                                )
+                                Text("Hrát hru")
+                            }
                         }
                     }
                 }
@@ -284,10 +305,10 @@ private fun ScreenshotGallery(screenshots: List<com.example.ap7mt.data.model.Scr
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(12.dp)
-                .size(40.dp),
+                .size(44.dp),
             shape = CircleShape,
-            color = Color.White.copy(alpha = 0.9f),
-            shadowElevation = 4.dp
+            color = Color.White.copy(alpha = 0.85f),
+            shadowElevation = 6.dp
         ) {
             IconButton(
                 onClick = { favoritesRepository.toggleFavorite(game.id) },
